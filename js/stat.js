@@ -12,6 +12,8 @@ var BAR_WIDTH = 40;
 var renderCloud = function (ctx, x, y, color) {
   ctx.fillStyle = color;
   ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
+
+  //  Вариант со скругленным облаком
   // ctx.beginPath();
   // ctx.moveTo(x, y + 30);
   // ctx.bezierCurveTo(x, y + 20, x + 10, y, x + 40, y);
@@ -54,11 +56,13 @@ window.renderStatistics = function (ctx, players, times) {
   for (var i = 0; i < players.length; i++) {
     var currentHeight = (BAR_HEIGHT * times[i]) / maxTime;
     var spaceBetweenBars = CLOUD_X + BAR_WIDTH + (GAP + BAR_WIDTH * 2) * i;
-    ctx.fillStyle = (players[i] === 'Вы') ? 'rgba(255, 0, 0, 1)' : 'hsl(240, 100%, 50%)';
-    // Вариант через интерполяцию
-    // `hsl(240, ${Math.floor(Math.random() * 101)}%, 50%)`
+
     ctx.fillText(Math.round(times[i]), spaceBetweenBars, CLOUD_Y * 8 + GAP);
+    // Вариант hsl через интерполяцию
+    // `hsl(240, ${Math.floor(Math.random() * 101)}%, 50%)`
+    ctx.fillStyle = (players[i] === 'Вы') ? 'rgba(255, 0, 0, 1)' : 'hsl(240, ' + Math.floor(Math.random() * 101) + '%, 50%)';
     ctx.fillRect(spaceBetweenBars, CLOUD_HEIGHT - currentHeight, BAR_WIDTH, currentHeight - FONT_GAP * 2);
+    ctx.fillStyle = 'black';
     ctx.fillText(players[i], spaceBetweenBars, CLOUD_HEIGHT - FONT_GAP - GAP);
   }
 };
