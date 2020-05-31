@@ -57,7 +57,7 @@ window.renderStatistics = function (ctx, players, times) {
     var currentHeight = (BAR_HEIGHT * times[i]) / maxTime;
     var spaceBetweenBars = CLOUD_X + BAR_WIDTH + (GAP + BAR_WIDTH * 2) * i;
 
-    ctx.fillText(Math.round(times[i]), spaceBetweenBars, CLOUD_Y * 8 + GAP);
+    ctx.fillText(Math.round(times[i]), spaceBetweenBars, CLOUD_HEIGHT - currentHeight - FONT_GAP - GAP);
     // Вариант hsl через интерполяцию
     // `hsl(240, ${Math.floor(Math.random() * 101)}%, 50%)`
     ctx.fillStyle = (players[i] === 'Вы') ? 'rgba(255, 0, 0, 1)' : 'hsl(240, ' + Math.floor(Math.random() * 101) + '%, 50%)';
