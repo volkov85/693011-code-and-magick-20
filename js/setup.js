@@ -44,7 +44,6 @@ for (var i = 0; i < 4; i++) {
   );
 }
 
-
 // Создание DOM элемента на основе JS объекта
 var renderWizard = function (wizard) {
   var wizardElement = similarWizardTemplate.cloneNode(true);
@@ -58,9 +57,9 @@ var renderWizard = function (wizard) {
 
 // Заполнение блока DOM-элементами на основе массива JS-объектов
 var fragment = document.createDocumentFragment();
-for (var j = 0; j < wizards.length; j++) {
-  fragment.appendChild(renderWizard(wizards[j]));
-}
+wizards.forEach(function (item, index) {
+  fragment.appendChild(renderWizard(wizards[index]));
+});
 similarListElement.appendChild(fragment);
 
 userDialog.querySelector('.setup-similar').classList.remove('hidden');
