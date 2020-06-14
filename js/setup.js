@@ -128,15 +128,54 @@ var renderWizard = function (wizard) {
  */
 var pushWizards = function (wizards) {
   var fragment = document.createDocumentFragment();
-  var similarListElement = userDialog.querySelector('.setup-similar-list');
+  var similarListElement = setup.querySelector('.setup-similar-list');
   wizards.forEach(function (item) {
     fragment.appendChild(renderWizard(item));
   });
   similarListElement.appendChild(fragment);
 };
 
-var userDialog = document.querySelector('.setup');
+var setup = document.querySelector('.setup');
 var wizards = generateWizards(WIZARD.COUNT);
-userDialog.classList.remove('hidden');
-userDialog.querySelector('.setup-similar').classList.remove('hidden');
+setup.querySelector('.setup-similar').classList.remove('hidden');
 pushWizards(wizards);
+
+var setupOpen = document.querySelector('.setup-open');
+var setupClose = setup.querySelector('.setup-close');
+
+var onPopupEscPress = function (evt) {
+  if (evt.key === 'Escape') {
+    evt.preventDefault();
+    closePopup();
+  }
+};
+
+var openPopup = function () {
+  setup.classList.remove('hidden');
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+var closePopup = function () {
+  setup.classList.add('hidden');
+  document.removeEventListener('keydown', onPopupEscPress);
+};
+
+setupOpen.addEventListener('click', function () {
+  openPopup();
+});
+
+setupOpen.addEventListener('keydown', function (evt) {
+  if (evt.key === 'Enter') {
+    openPopup();
+  }
+});
+
+setupClose.addEventListener('click', function () {
+  closePopup();
+});
+
+setupClose.addEventListener('keydown', function (evt) {
+  if (evt.key === 'Enter') {
+    closePopup();
+  }
+});
