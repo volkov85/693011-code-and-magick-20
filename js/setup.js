@@ -1,6 +1,6 @@
 'use strict';
 
-var WIZARD = {
+var Wizard = {
   COUNT: 4,
   NAMES: [
     'Иван',
@@ -38,6 +38,8 @@ var WIZARD = {
     'green'
   ]
 };
+var MIN_NAME_LENGTH = 2;
+var MAX_NAME_LENGTH = 25;
 
 /**
  * Перемешивание массива по алгоритму Фишера — Йетса
@@ -81,8 +83,8 @@ var getRandomElementFromArray = function (array) {
  * @return {string} - строка вида 'имя фамилия'
  */
 var nameGenerate = function () {
-  var randomName = getRandomElementFromArray(WIZARD.NAMES);
-  var randomSurename = getRandomElementFromArray(WIZARD.SURNAMES);
+  var randomName = getRandomElementFromArray(Wizard.NAMES);
+  var randomSurename = getRandomElementFromArray(Wizard.SURNAMES);
   var nameArray = [randomName, randomSurename];
   return shuffleArray(nameArray).join(' ');
 };
@@ -98,8 +100,8 @@ var generateWizards = function (wizardsCount) {
     wizards.push(
         {
           name: nameGenerate(),
-          coatColor: getRandomElementFromArray(WIZARD.COATS),
-          eyesColor: getRandomElementFromArray(WIZARD.EYES)
+          coatColor: getRandomElementFromArray(Wizard.COATS),
+          eyesColor: getRandomElementFromArray(Wizard.EYES)
         }
     );
   }
@@ -136,28 +138,44 @@ var pushWizards = function (wizards) {
 };
 
 var setup = document.querySelector('.setup');
-var wizards = generateWizards(WIZARD.COUNT);
+var wizards = generateWizards(Wizard.COUNT);
+
 setup.querySelector('.setup-similar').classList.remove('hidden');
 pushWizards(wizards);
 
 var setupOpen = document.querySelector('.setup-open');
 var setupClose = setup.querySelector('.setup-close');
 
+/**
+ * Отменяет стандартное событие на escape и вызывает функцию closePopup
+ * Работает только, если нет в фокусе элемента .setup-user-name
+ * @param {Object} evt - KeyboardEvent нажатая клавиша
+ */
 var onPopupEscPress = function (evt) {
   if (evt.key === 'Escape') {
-    evt.preventDefault();
-    closePopup();
+    if (!evt.target.matches('.setup-user-name')) {
+      evt.preventDefault();
+      closePopup();
+    }
   }
 };
 
+/**
+ * Открытие модального окна, вызов обработчика событий EventListener
+ */
 var openPopup = function () {
   setup.classList.remove('hidden');
   document.addEventListener('keydown', onPopupEscPress);
+  // setupUserName.addEventListener('keydown', onPopupEscDontPress);
 };
 
+/**
+ * Закрытие модального окна, удаление обработчика событий EventListener
+ */
 var closePopup = function () {
   setup.classList.add('hidden');
   document.removeEventListener('keydown', onPopupEscPress);
+  // setupUserName.removeEventListener('keydown', onPopupEscDontPress);
 };
 
 setupOpen.addEventListener('click', function () {
@@ -177,5 +195,27 @@ setupClose.addEventListener('click', function () {
 setupClose.addEventListener('keydown', function (evt) {
   if (evt.key === 'Enter') {
     closePopup();
+  }
+});
+
+var userNameInput = document.querySelector('.setup-user-name');
+
+userNameInput.addEventListener('invalid', function () {
+  if (userNameInput.validity.valueMissing) {
+    userNameInput.setCustomValidity('Обязательное поле');
+  } else {
+    userNameInput.setCustomValidity('');
+  }
+});
+
+userNameInput.addEventListener('input', function () {
+  var valueLength = userNameInput.value.length;
+
+  if (valueLength < MIN_NAME_LENGTH) {
+    userNameInput.setCustomValidity('Ещё ' + (MIN_NAME_LENGTH - valueLength) + ' симв.');
+  } else if (valueLength > MAX_NAME_LENGTH) {
+    userNameInput.setCustomValidity('Удалите лишние ' + (valueLength - MAX_NAME_LENGTH) + ' симв.');
+  } else {
+    userNameInput.setCustomValidity('');
   }
 });
