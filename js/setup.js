@@ -104,13 +104,11 @@ var nameGenerate = function () {
 var generateWizards = function (wizardsCount) {
   var wizards = [];
   for (var i = 0; i < wizardsCount; i++) {
-    wizards.push(
-        {
-          name: nameGenerate(),
-          coatColor: getRandomElementFromArray(Wizard.COATS),
-          eyesColor: getRandomElementFromArray(Wizard.EYES)
-        }
-    );
+    wizards.push({
+      name: nameGenerate(),
+      coatColor: getRandomElementFromArray(Wizard.COATS),
+      eyesColor: getRandomElementFromArray(Wizard.EYES)
+    });
   }
   return wizards;
 };
@@ -138,8 +136,8 @@ var renderWizard = function (wizard) {
 var pushWizards = function (wizards) {
   var fragment = document.createDocumentFragment();
   var similarListElement = setup.querySelector('.setup-similar-list');
-  wizards.forEach(function (item) {
-    fragment.appendChild(renderWizard(item));
+  wizards.forEach(function (wizard) {
+    fragment.appendChild(renderWizard(wizard));
   });
   similarListElement.appendChild(fragment);
 };
@@ -160,7 +158,7 @@ var setupClose = setup.querySelector('.setup-close');
  */
 var onPopupEscPress = function (evt) {
   if (evt.key === 'Escape') {
-    if (!evt.target.matches('.setup-user-name')) {
+    if (!document.activeElement.classList.contains('setup-user-name')) {
       evt.preventDefault();
       closePopup();
     }
@@ -228,49 +226,34 @@ userNameInput.addEventListener('input', function () {
 var wizardCoat = setup.querySelector('.wizard-coat');
 var wizardEye = setup.querySelector('.wizard-eyes');
 var wizardFireball = setup.querySelector('.setup-fireball-wrap');
+var coatInput = setup.querySelector('input[name="coat-color"]');
+var eyesInput = setup.querySelector('input[name="eyes-color"]');
+var fireballInput = setup.querySelector('input[name="fireball-color"]');
 
 /**
- * Закрашивает мантию мага рандомным цветом из массива coats
- * @param {Array} coats - массив с цветами мантии
+ * Берет случайный цвет из массива, красит им элемент и добавляет в input
+ * @param {Object} colors - массив с цветами
+ * @param {Object} node - DOM элемент, который нужно закрасить
+ * @param {Object} input - элемент, через который идет отправка данных
  */
-var changeWizardCoat = function (coats) {
-  var coatInput = setup.querySelector('input[name="coat-color"]');
-  var newColor = getRandomElementFromArray(coats);
-  wizardCoat.style.fill = newColor;
-  coatInput.value = newColor;
-};
-
-/**
- * Закрашивает глаз мага рандомным цветом из массива eyes
- * @param {Array} eyes - массив с цветами мантии
- */
-var changeWizardEye = function (eyes) {
-  var eyesInput = setup.querySelector('input[name="eyes-color"]');
-  var newColor = getRandomElementFromArray(eyes);
-  wizardEye.style.fill = newColor;
-  eyesInput.value = newColor;
-};
-
-/**
- * Закрашивает fireball мага рандомным цветом из массива fireball
- * @param {Array} fireball - массив с цветами огнешара
- */
-var changeWizardFireball = function (fireball) {
-  var fireballInput = setup.querySelector('input[name="fireball-color"]');
-  var newColor = getRandomElementFromArray(fireball);
-  wizardFireball.style.background = newColor;
-  fireballInput.value = newColor;
+var changeColor = function (colors, node, input) {
+  var newColor = getRandomElementFromArray(colors);
+  if (node === wizardFireball) {
+    node.style.background = newColor;
+  } else {
+    node.style.fill = newColor;
+  }
+  input.value = newColor;
 };
 
 wizardCoat.addEventListener('click', function () {
-  changeWizardCoat(Wizard.COATS);
+  changeColor(Wizard.COATS, wizardCoat, coatInput);
 });
 
 wizardEye.addEventListener('click', function () {
-  changeWizardEye(Wizard.EYES);
+  changeColor(Wizard.EYES, wizardEye, eyesInput);
 });
 
 wizardFireball.addEventListener('click', function () {
-  changeWizardFireball(Wizard.FIREBALL);
+  changeColor(Wizard.FIREBALL, wizardFireball, fireballInput);
 });
-
