@@ -70,8 +70,6 @@ var shuffleArray = function (array) {
  * @return {number} - рандомное число из диапазона
  */
 var getRandomNumber = function (min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
   return Math.floor(Math.random() * (max - min + 1)) + min;
 };
 
@@ -85,15 +83,27 @@ var getRandomElementFromArray = function (array) {
   return array[getRandomNumber(0, array.length - 1)];
 };
 
+// /**
+//  * Создание массива со случайными именем и фамилией, перемешивание и преобразование в строку
+//  * @return {string} - строка вида 'имя фамилия'
+//  */
+// var nameGenerate = function () {
+//   var randomName = getRandomElementFromArray(Wizard.NAMES);
+//   var randomSurename = getRandomElementFromArray(Wizard.SURNAMES);
+//   var nameArray = [randomName, randomSurename];
+//   return shuffleArray(nameArray).join(' ');
+// };
+
 /**
- * Создание массива со случайными именем и фамилией, перемешивание и преобразование в строку
- * @return {string} - строка вида 'имя фамилия'
+ * Создаёт новый массив, в котором будут все элементы исходного, за исключением элемента filter
+ * @param {Array} array - исходный массив
+ * @param {string} filter - элемент, который надо исключить из нового массива
+ * @return {Array} - новый отфильтрованный массив
  */
-var nameGenerate = function () {
-  var randomName = getRandomElementFromArray(Wizard.NAMES);
-  var randomSurename = getRandomElementFromArray(Wizard.SURNAMES);
-  var nameArray = [randomName, randomSurename];
-  return shuffleArray(nameArray).join(' ');
+var getFilteredArray = function (array, filter) {
+  return array.filter(function (item) {
+    return item !== filter;
+  });
 };
 
 /**
@@ -103,12 +113,38 @@ var nameGenerate = function () {
  */
 var generateWizards = function (wizardsCount) {
   var wizards = [];
+  // var reducedNamesArray = [];
+  // var reducedSurnamesArray = [];
+  var nameWizard = getRandomElementFromArray(Wizard.NAMES);
+  var surnameWizard = getRandomElementFromArray(Wizard.SURNAMES);
+  var generatedName = shuffleArray([nameWizard, surnameWizard]).join(' ');
+  // reducedNamesArray = Wizard.NAMES.filter(function (item) {
+  //   return item !== nameWizard;
+  // });
+  var reducedNamesArray = getFilteredArray(Wizard.NAMES, nameWizard);
+  // reducedSurnamesArray = Wizard.SURNAMES.filter(function (item) {
+  //   return item !== surnameWizard;
+  // });
+  var reducedSurnamesArray = getFilteredArray(Wizard.SURNAMES, surnameWizard);
   for (var i = 0; i < wizardsCount; i++) {
     wizards.push({
-      name: nameGenerate(),
+      name: generatedName,
       coatColor: getRandomElementFromArray(Wizard.COATS),
       eyesColor: getRandomElementFromArray(Wizard.EYES)
     });
+    // reducedNamesArray = reducedNamesArray.filter(function (item) {
+    //   return item !== nameWizard;
+    // });
+    reducedNamesArray = getFilteredArray(reducedNamesArray, nameWizard);
+    nameWizard = getRandomElementFromArray(reducedNamesArray);
+
+    // reducedSurnamesArray = reducedSurnamesArray.filter(function (item) {
+    //   return item !== surnameWizard;
+    // });
+    reducedSurnamesArray = getFilteredArray(reducedSurnamesArray, surnameWizard);
+    surnameWizard = getRandomElementFromArray(reducedSurnamesArray);
+
+    generatedName = shuffleArray([nameWizard, surnameWizard]).join(' ');
   }
   return wizards;
 };
