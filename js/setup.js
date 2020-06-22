@@ -240,29 +240,23 @@ var eyesInput = setup.querySelector('input[name="eyes-color"]');
 var fireballInput = setup.querySelector('input[name="fireball-color"]');
 
 /**
- * Берет случайный цвет из массива, красит им элемент и добавляет в input
+ * При клике на node - берет случайный цвет из массива, красит им элемент и добавляет в input
  * @param {Object} colors - массив с цветами
  * @param {Object} node - DOM элемент, который нужно закрасить
  * @param {Object} input - элемент, через который идет отправка данных
  */
-var changeColor = function (colors, node, input) {
-  var newColor = getRandomElementFromArray(colors);
-  if (node === wizardFireball) {
-    node.style.background = newColor;
-  } else {
-    node.style.fill = newColor;
-  }
-  input.value = newColor;
+var onClickChangeColor = function (colors, node, input) {
+  node.addEventListener('click', function () {
+    var newColor = getRandomElementFromArray(colors);
+    if (node === wizardFireball) {
+      node.style.background = newColor;
+    } else {
+      node.style.fill = newColor;
+    }
+    input.value = newColor;
+  });
 };
 
-wizardCoat.addEventListener('click', function () {
-  changeColor(Wizard.COATS, wizardCoat, coatInput);
-});
-
-wizardEye.addEventListener('click', function () {
-  changeColor(Wizard.EYES, wizardEye, eyesInput);
-});
-
-wizardFireball.addEventListener('click', function () {
-  changeColor(Wizard.FIREBALL, wizardFireball, fireballInput);
-});
+onClickChangeColor(Wizard.COATS, wizardCoat, coatInput);
+onClickChangeColor(Wizard.EYES, wizardEye, eyesInput);
+onClickChangeColor(Wizard.FIREBALL, wizardFireball, fireballInput);
