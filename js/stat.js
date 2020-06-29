@@ -10,11 +10,23 @@
   var BAR_HEIGHT = 150;
   var BAR_WIDTH = 40;
 
+  /**
+   * Функция отрисовки прямоугольника
+   * @param {Object} ctx объект Canvas
+   * @param {number} x координата х
+   * @param {number} y координата у
+   * @param {string} color цвет прямоугольника
+   */
   var renderCloud = function (ctx, x, y, color) {
     ctx.fillStyle = color;
     ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
   };
 
+  /**
+   * Возвращает максимальное значение из всех элементов исходного массива
+   * @param {Array} arr - исходный массив
+   * @return {number} maxElement - максимальное число из исходного массива
+   */
   var getMaxElement = function (arr) {
     var maxElement = arr[0];
 
@@ -27,6 +39,12 @@
     return maxElement;
   };
 
+  /**
+   * Функция отрисовки окна статистики
+   * @param {Object} ctx объект Canvas
+   * @param {Array} players массив с именами игроков
+   * @param {Array} times массив с рекодами
+   */
   window.renderStatistics = function (ctx, players, times) {
     renderCloud(ctx, CLOUD_X + GAP, CLOUD_Y + GAP, 'rgba(0, 0, 0, 0.7)');
     renderCloud(ctx, CLOUD_X, CLOUD_Y, '#fff');

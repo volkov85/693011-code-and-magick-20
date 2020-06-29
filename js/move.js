@@ -14,6 +14,10 @@
 
     var dragged = false;
 
+    /**
+     * Измененяет местоположение окна при движении мышью с зажатой клавишей
+     * @param {Object} moveEvt событие при движении мышью
+     */
     var onMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
@@ -34,6 +38,10 @@
 
     };
 
+    /**
+     * При изменении местоположения не позволяет запускать выбор аватара при отпускании клавиши мыши
+     * @param {Object} upEvt событие при отпускании клавиши мыши
+     */
     var onMouseUp = function (upEvt) {
       upEvt.preventDefault();
 
