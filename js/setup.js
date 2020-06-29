@@ -65,26 +65,6 @@
   };
 
   /**
-   * Генерирует рандомное число в диапазоне (Максимум и минимум включаются)
-   * @param  {number} min - от какого числа
-   * @param  {number} max - до какого числа
-   * @return {number} - рандомное число из диапазона
-   */
-  var getRandomNumber = function (min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-  };
-
-
-  /**
-   * Берет случайный элемент из массива
-   * @param  {Array} array - исходный массив
-   * @return {string} - рандомный элемент из массива
-   */
-  var getRandomElementFromArray = function (array) {
-    return array[getRandomNumber(0, array.length - 1)];
-  };
-
-  /**
    * Создаёт новый массив, в котором будут все элементы исходного, за исключением элемента filter
    * @param {Array} array - исходный массив
    * @param {string} filter - элемент, который надо исключить из нового массива
@@ -103,21 +83,21 @@
    */
   var generateWizards = function (wizardsCount) {
     var wizards = [];
-    var nameWizard = getRandomElementFromArray(Wizard.NAMES);
-    var surnameWizard = getRandomElementFromArray(Wizard.SURNAMES);
+    var nameWizard = window.util.getRandomElementFromArray(Wizard.NAMES);
+    var surnameWizard = window.util.getRandomElementFromArray(Wizard.SURNAMES);
     var generatedName = shuffleArray([nameWizard, surnameWizard]).join(' ');
     var reducedNamesArray = getFilteredArray(Wizard.NAMES, nameWizard);
     var reducedSurnamesArray = getFilteredArray(Wizard.SURNAMES, surnameWizard);
     for (var i = 0; i < wizardsCount; i++) {
       wizards.push({
         name: generatedName,
-        coatColor: getRandomElementFromArray(Wizard.COATS),
-        eyesColor: getRandomElementFromArray(Wizard.EYES)
+        coatColor: window.util.getRandomElementFromArray(Wizard.COATS),
+        eyesColor: window.util.getRandomElementFromArray(Wizard.EYES)
       });
       reducedNamesArray = getFilteredArray(reducedNamesArray, nameWizard);
-      nameWizard = getRandomElementFromArray(reducedNamesArray);
+      nameWizard = window.util.getRandomElementFromArray(reducedNamesArray);
       reducedSurnamesArray = getFilteredArray(reducedSurnamesArray, surnameWizard);
-      surnameWizard = getRandomElementFromArray(reducedSurnamesArray);
+      surnameWizard = window.util.getRandomElementFromArray(reducedSurnamesArray);
       generatedName = shuffleArray([nameWizard, surnameWizard]).join(' ');
     }
     return wizards;
