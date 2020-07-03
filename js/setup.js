@@ -3,26 +3,6 @@
 (function () {
   var Wizard = {
     COUNT: 4,
-    NAMES: [
-      'Иван',
-      'Хуан Себастьян',
-      'Мария',
-      'Кристоф',
-      'Виктор',
-      'Юлия',
-      'Люпита',
-      'Вашингтон'
-    ],
-    SURNAMES: [
-      'да Марья',
-      'Верон',
-      'Мирабелла',
-      'Вальц',
-      'Онопко',
-      'Топольницкая',
-      'Нионго',
-      'Ирвинг'
-    ],
     COATS: [
       'rgb(101, 137, 164)',
       'rgb(241, 43, 107)',
@@ -50,60 +30,6 @@
   var MAX_NAME_LENGTH = 25;
 
   /**
-   * Перемешивание массива по алгоритму Фишера — Йетса
-   * @param  {Array} array - исходный массив
-   * @return {Array} array - перемешанный массив
-   */
-  var shuffleArray = function (array) {
-    for (var i = array.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = array[i];
-      array[i] = array[j];
-      array[j] = t;
-    }
-    return array;
-  };
-
-  /**
-   * Создаёт новый массив, в котором будут все элементы исходного, за исключением элемента filter
-   * @param {Array} array - исходный массив
-   * @param {string} filter - элемент, который надо исключить из нового массива
-   * @return {Array} - новый отфильтрованный массив
-   */
-  var getFilteredArray = function (array, filter) {
-    return array.filter(function (item) {
-      return item !== filter;
-    });
-  };
-
-  /**
-   * Генерирует массив моков, каждый элемент которого состоит из объекта
-   * @param  {number} wizardsCount - желаемое количевто элементов массива
-   * @return {Array} wizards - готовый массив с требуемой длиной
-   */
-  var generateWizards = function (wizardsCount) {
-    var wizards = [];
-    var nameWizard = window.util.getRandomElementFromArray(Wizard.NAMES);
-    var surnameWizard = window.util.getRandomElementFromArray(Wizard.SURNAMES);
-    var generatedName = shuffleArray([nameWizard, surnameWizard]).join(' ');
-    var reducedNamesArray = getFilteredArray(Wizard.NAMES, nameWizard);
-    var reducedSurnamesArray = getFilteredArray(Wizard.SURNAMES, surnameWizard);
-    for (var i = 0; i < wizardsCount; i++) {
-      wizards.push({
-        name: generatedName,
-        coatColor: window.util.getRandomElementFromArray(Wizard.COATS),
-        eyesColor: window.util.getRandomElementFromArray(Wizard.EYES)
-      });
-      reducedNamesArray = getFilteredArray(reducedNamesArray, nameWizard);
-      nameWizard = window.util.getRandomElementFromArray(reducedNamesArray);
-      reducedSurnamesArray = getFilteredArray(reducedSurnamesArray, surnameWizard);
-      surnameWizard = window.util.getRandomElementFromArray(reducedSurnamesArray);
-      generatedName = shuffleArray([nameWizard, surnameWizard]).join(' ');
-    }
-    return wizards;
-  };
-
-  /**
    * Создание DOM элемента на основе JS объекта
    * @param {Object} wizard - элемент массива wizards
    * @return {Object} wizardElement - клон ноды .setup-similar-item с рандомными данными
@@ -114,30 +40,38 @@
     .querySelector('.setup-similar-item');
     var wizardElement = similarWizardTemplate.cloneNode(true);
     wizardElement.querySelector('.setup-similar-label').textContent = wizard.name;
-    wizardElement.querySelector('.wizard-coat').style.fill = wizard.coatColor;
-    wizardElement.querySelector('.wizard-eyes').style.fill = wizard.eyesColor;
+    wizardElement.querySelector('.wizard-coat').style.fill = wizard.colorCoat;
+    wizardElement.querySelector('.wizard-eyes').style.fill = wizard.colorEyes;
     return wizardElement;
   };
 
-  /**
-   * Заполнение блока DOM-элементами на основе массива JS-объектов
-   * @param  {Array} wizards - массив, содержащий сгенерированные данные
-   */
-  var pushWizards = function (wizards) {
+  var successHandler = function (wizards) {
     var fragment = document.createDocumentFragment();
     var similarListElement = setup.querySelector('.setup-similar-list');
-    wizards.forEach(function (wizard) {
-      fragment.appendChild(renderWizard(wizard));
-    });
+
+    for (var i = 0; i < Wizard.COUNT; i++) {
+      fragment.appendChild(renderWizard(wizards[i]));
+    }
     similarListElement.appendChild(fragment);
+
+    setup.querySelector('.setup-similar').classList.remove('hidden');
   };
 
+  var errorHandler = function (errorMessage) {
+    var node = document.createElement('div');
+    node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+    node.style.position = 'absolute';
+    node.style.left = 0;
+    node.style.right = 0;
+    node.style.fontSize = '30px';
+
+    node.textContent = errorMessage;
+    document.body.insertAdjacentElement('afterbegin', node);
+  };
+
+  window.backend.load(successHandler, errorHandler);
+
   var setup = document.querySelector('.setup');
-  var wizards = generateWizards(Wizard.COUNT);
-
-  setup.querySelector('.setup-similar').classList.remove('hidden');
-  pushWizards(wizards);
-
   var userNameInput = document.querySelector('.setup-user-name');
 
   userNameInput.addEventListener('invalid', function () {
@@ -170,4 +104,13 @@
   window.colorize(Wizard.COATS, wizardCoat, coatInput);
   window.colorize(Wizard.EYES, wizardEye, eyesInput);
   window.colorize(Wizard.FIREBALL, wizardFireball, fireballInput);
+
+  var form = setup.querySelector('.setup-wizard-form');
+  var submitHandler = function (evt) {
+    window.backend.save(new FormData(form), function () {
+      setup.classList.add('hidden');
+    }, errorHandler);
+    evt.preventDefault();
+  };
+  form.addEventListener('submit', submitHandler);
 })();
