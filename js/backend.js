@@ -10,6 +10,12 @@ window.backend = (function () {
   var TIMEOUT_OUT_MS = 1000;
 
   return {
+    /**
+     * Функция отправки данных на сервер
+     * @param {Object} data - отправляемые данные
+     * @param {Function} onLoad - функция, отрабатываемая при успешной загрузке
+     * @param {Function} onError - функция отрабатывает при возниковении ошибки
+     */
     save: function (data, onLoad, onError) {
       var xhr = new XMLHttpRequest();
       xhr.responseType = 'json';
@@ -33,6 +39,11 @@ window.backend = (function () {
       xhr.open('POST', URL);
       xhr.send(data);
     },
+    /**
+     * Функция получения данных с сервера
+     * @param {Function} onLoad - функция, отрабатываемая при успешной загрузке
+     * @param {Function} onError - функция отрабатывает при возниковении ошибки
+     */
     load: function (onLoad, onError) {
       var xhr = new XMLHttpRequest();
       xhr.responseType = 'json';

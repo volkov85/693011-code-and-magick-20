@@ -45,6 +45,10 @@
     return wizardElement;
   };
 
+  /**
+   * Заполнение блока DOM-элементами на основе массива JS-объектов
+   * @param  {Array} wizards - массив, содержащий сгенерированные данные
+   */
   var successHandler = function (wizards) {
     var fragment = document.createDocumentFragment();
     var similarListElement = setup.querySelector('.setup-similar-list');
@@ -57,6 +61,10 @@
     setup.querySelector('.setup-similar').classList.remove('hidden');
   };
 
+  /**
+   * Формирование и вывод сообщения об ошибке
+   * @param {string} errorMessage - строка сообщение об ошибке
+   */
   var errorHandler = function (errorMessage) {
     var node = document.createElement('div');
     node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
