@@ -10,6 +10,13 @@ window.backend = (function () {
   };
   var TIMEOUT_IN_MS = 10000;
 
+  /**
+   * Отправляет или загружает данные в зависимотсти от флага
+   * @param {Function} onLoad - функция, отрабатываемая при успешной загрузке
+   * @param {Function} onError - функция отрабатывает при возниковении ошибки
+   * @param {boolean} flag - флаг-переключатель, передаваемый для отправки или получения данных
+   * @param {Object} data - передаваемые данные в случае отправки
+   */
   var loadData = function (onLoad, onError, flag, data) {
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
