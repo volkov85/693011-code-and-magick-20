@@ -1,37 +1,83 @@
 'use strict';
 
 (function () {
-  var Wizard = {
-    COATS: [
-      'rgb(101, 137, 164)',
-      'rgb(241, 43, 107)',
-      'rgb(146, 100, 161)',
-      'rgb(56, 159, 117)',
-      'rgb(215, 210, 55)',
-      'rgb(0, 0, 0)'
-    ],
-    EYES: [
-      'black',
-      'red',
-      'blue',
-      'yellow',
-      'green'
-    ],
-    FIREBALL: [
-      '#ee4830',
-      '#30a8ee',
-      '#5ce6c0',
-      '#e848d5',
-      '#e6e848'
-    ]
+
+  var coatColor = 'rgb(101, 137, 164)';
+  var eyesColor = 'black';
+  var storedWizards = [];
+
+  /**
+   * Создает систему рангов для сортировки по приоритетам
+   * @param {Object} wizard - маг, которому нужно присвоить ранг
+   * @return {number} rank - количество баллов для мага
+   */
+  var getRank = function (wizard) {
+    var rank = 0;
+
+    if (wizard.colorCoat === coatColor) {
+      rank += 2;
+    }
+    if (wizard.colorEyes === eyesColor) {
+      rank += 1;
+    }
+
+    return rank;
   };
+
+  /**
+   * Сортировка по имени в алфавитном порядке в случае, если все другие параметры равны
+   * @param {string} left - имя для сортировки
+   * @param {string} right - имя для сортировки
+   * @return {number} - возвращает 1, -1 или 0 для передачи в метод sort()
+   */
+  var namesComparator = function (left, right) {
+    if (left > right) {
+      return 1;
+    } else if (left < right) {
+      return -1;
+    } else {
+      return 0;
+    }
+  };
+
+  /**
+   * Вызывает повторный рендеринг отсортированных магов
+   */
+  var updateWizards = function () {
+    window.render.appendWizard(storedWizards.sort(function (left, right) {
+      var rankDiff = getRank(right) - getRank(left);
+      if (rankDiff === 0) {
+        rankDiff = namesComparator(left.name, right.name);
+      }
+      return rankDiff;
+    }));
+  };
+
+  /**
+   * Вызов функции повторного рендеринга при изменении цвета глаз
+   * @param {string} color - цвет глаз
+   */
+  window.wizard.onEyesChange = window.debounce(function (color) {
+    eyesColor = color;
+    updateWizards();
+  });
+
+  /**
+   * Вызов функции повторного рендеринга при изменении цвета мантии
+   * @param {string} color - цвет мантии
+   */
+  window.wizard.onCoatChange = window.debounce(function (color) {
+    coatColor = color;
+    updateWizards();
+  });
 
   /**
    * Заполнение блока DOM-элементами на основе массива JS-объектов
    * @param  {Array} wizards - массив, содержащий сгенерированные данные
    */
   var successHandler = function (wizards) {
-    window.render.appendWizard(wizards);
+    storedWizards = wizards;
+    updateWizards();
   };
 
   /**
@@ -53,23 +99,18 @@
   window.backend.load(successHandler, errorHandler);
 
   var setup = document.querySelector('.setup');
-  var wizardCoat = setup.querySelector('.wizard-coat');
-  var wizardEye = setup.querySelector('.wizard-eyes');
-  var wizardFireball = setup.querySelector('.setup-fireball-wrap');
-  var coatInput = setup.querySelector('input[name="coat-color"]');
-  var eyesInput = setup.querySelector('input[name="eyes-color"]');
-  var fireballInput = setup.querySelector('input[name="fireball-color"]');
-
-  window.colorize(Wizard.COATS, wizardCoat, coatInput);
-  window.colorize(Wizard.EYES, wizardEye, eyesInput);
-  window.colorize(Wizard.FIREBALL, wizardFireball, fireballInput);
-
   var form = setup.querySelector('.setup-wizard-form');
+
+  /**
+   * Вызывает функцию отправки данных на сервер
+   * @param {Object} evt - событие submit
+   */
   var submitHandler = function (evt) {
     window.backend.save(new FormData(form), function () {
       setup.classList.add('hidden');
     }, errorHandler);
     evt.preventDefault();
   };
+
   form.addEventListener('submit', submitHandler);
 })();

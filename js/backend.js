@@ -1,6 +1,7 @@
 'use strict';
 
 window.backend = (function () {
+
   var DataUrl = {
     SAVE_URL: 'https://javascript.pages.academy/code-and-magick',
     LOAD_URL: 'https://javascript.pages.academy/code-and-magick/data'
