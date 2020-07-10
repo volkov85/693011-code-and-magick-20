@@ -1,64 +1,83 @@
 'use strict';
 
 (function () {
-  var Wizard = {
-    COUNT: 4,
-    COATS: [
-      'rgb(101, 137, 164)',
-      'rgb(241, 43, 107)',
-      'rgb(146, 100, 161)',
-      'rgb(56, 159, 117)',
-      'rgb(215, 210, 55)',
-      'rgb(0, 0, 0)'
-    ],
-    EYES: [
-      'black',
-      'red',
-      'blue',
-      'yellow',
-      'green'
-    ],
-    FIREBALL: [
-      '#ee4830',
-      '#30a8ee',
-      '#5ce6c0',
-      '#e848d5',
-      '#e6e848'
-    ]
-  };
-  var MIN_NAME_LENGTH = 2;
-  var MAX_NAME_LENGTH = 25;
+
+  var coatColor = 'rgb(101, 137, 164)';
+  var eyesColor = 'black';
+  var storedWizards = [];
 
   /**
-   * Создание DOM элемента на основе JS объекта
-   * @param {Object} wizard - элемент массива wizards
-   * @return {Object} wizardElement - клон ноды .setup-similar-item с рандомными данными
+   * Создает систему рангов для сортировки по приоритетам
+   * @param {Object} wizard - маг, которому нужно присвоить ранг
+   * @return {number} rank - количество баллов для мага
    */
-  var renderWizard = function (wizard) {
-    var similarWizardTemplate = document.querySelector('#similar-wizard-template')
-    .content
-    .querySelector('.setup-similar-item');
-    var wizardElement = similarWizardTemplate.cloneNode(true);
-    wizardElement.querySelector('.setup-similar-label').textContent = wizard.name;
-    wizardElement.querySelector('.wizard-coat').style.fill = wizard.colorCoat;
-    wizardElement.querySelector('.wizard-eyes').style.fill = wizard.colorEyes;
-    return wizardElement;
+  var getRank = function (wizard) {
+    var rank = 0;
+
+    if (wizard.colorCoat === coatColor) {
+      rank += 2;
+    }
+    if (wizard.colorEyes === eyesColor) {
+      rank += 1;
+    }
+
+    return rank;
   };
+
+  /**
+   * Сортировка по имени в алфавитном порядке в случае, если все другие параметры равны
+   * @param {string} left - имя для сортировки
+   * @param {string} right - имя для сортировки
+   * @return {number} - возвращает 1, -1 или 0 для передачи в метод sort()
+   */
+  var namesComparator = function (left, right) {
+    if (left > right) {
+      return 1;
+    } else if (left < right) {
+      return -1;
+    } else {
+      return 0;
+    }
+  };
+
+  /**
+   * Вызывает повторный рендеринг отсортированных магов
+   */
+  var updateWizards = function () {
+    window.render.appendWizard(storedWizards.sort(function (left, right) {
+      var rankDiff = getRank(right) - getRank(left);
+      if (rankDiff === 0) {
+        rankDiff = namesComparator(left.name, right.name);
+      }
+      return rankDiff;
+    }));
+  };
+
+  /**
+   * Вызов функции повторного рендеринга при изменении цвета глаз
+   * @param {string} color - цвет глаз
+   */
+  window.wizard.onEyesChange = window.debounce(function (color) {
+    eyesColor = color;
+    updateWizards();
+  });
+
+  /**
+   * Вызов функции повторного рендеринга при изменении цвета мантии
+   * @param {string} color - цвет мантии
+   */
+  window.wizard.onCoatChange = window.debounce(function (color) {
+    coatColor = color;
+    updateWizards();
+  });
 
   /**
    * Заполнение блока DOM-элементами на основе массива JS-объектов
    * @param  {Array} wizards - массив, содержащий сгенерированные данные
    */
   var successHandler = function (wizards) {
-    var fragment = document.createDocumentFragment();
-    var similarListElement = setup.querySelector('.setup-similar-list');
-
-    for (var i = 0; i < Wizard.COUNT; i++) {
-      fragment.appendChild(renderWizard(wizards[i]));
-    }
-    similarListElement.appendChild(fragment);
-
-    setup.querySelector('.setup-similar').classList.remove('hidden');
+    storedWizards = wizards;
+    updateWizards();
   };
 
   /**
@@ -80,45 +99,18 @@
   window.backend.load(successHandler, errorHandler);
 
   var setup = document.querySelector('.setup');
-  var userNameInput = document.querySelector('.setup-user-name');
-
-  userNameInput.addEventListener('invalid', function () {
-    if (userNameInput.validity.valueMissing) {
-      userNameInput.setCustomValidity('Обязательное поле');
-    } else {
-      userNameInput.setCustomValidity('');
-    }
-  });
-
-  userNameInput.addEventListener('input', function () {
-    var valueLength = userNameInput.value.length;
-
-    if (valueLength < MIN_NAME_LENGTH) {
-      userNameInput.setCustomValidity('Ещё ' + (MIN_NAME_LENGTH - valueLength) + ' симв.');
-    } else if (valueLength > MAX_NAME_LENGTH) {
-      userNameInput.setCustomValidity('Удалите лишние ' + (valueLength - MAX_NAME_LENGTH) + ' симв.');
-    } else {
-      userNameInput.setCustomValidity('');
-    }
-  });
-
-  var wizardCoat = setup.querySelector('.wizard-coat');
-  var wizardEye = setup.querySelector('.wizard-eyes');
-  var wizardFireball = setup.querySelector('.setup-fireball-wrap');
-  var coatInput = setup.querySelector('input[name="coat-color"]');
-  var eyesInput = setup.querySelector('input[name="eyes-color"]');
-  var fireballInput = setup.querySelector('input[name="fireball-color"]');
-
-  window.colorize(Wizard.COATS, wizardCoat, coatInput);
-  window.colorize(Wizard.EYES, wizardEye, eyesInput);
-  window.colorize(Wizard.FIREBALL, wizardFireball, fireballInput);
-
   var form = setup.querySelector('.setup-wizard-form');
+
+  /**
+   * Вызывает функцию отправки данных на сервер
+   * @param {Object} evt - событие submit
+   */
   var submitHandler = function (evt) {
     window.backend.save(new FormData(form), function () {
       setup.classList.add('hidden');
     }, errorHandler);
     evt.preventDefault();
   };
+
   form.addEventListener('submit', submitHandler);
 })();
